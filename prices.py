@@ -19,7 +19,7 @@ s3_client = boto3.client('s3')
 
 
 @retry(wait=wait_fixed(5))
-def get_price(selector, exchange, market) -> float:
+def get_price(selector, exchange, market):
     """Fetched den aktuellen Marktpreis für die jeweilige Seite"""
     try:
         orderbook = exchange.fetch_order_book(market)
@@ -57,11 +57,13 @@ def df_to_s3_csv(df,csv_name):
 
 
 prices = []
+dts = []
 while True:
     price = get_price(selector='avg_price', exchange=exchange, market='BTC/USDT')
     print(f'price: {price}')
     prices.append(price)
-    df = pd.DataFrame({'dt':datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S'),'prices':prices})
+    dts.append(datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
+    df = pd.DataFrame({'dt':dts,'prices':prices})
     df_to_s3_csv(df,'prices')
     print('added price')
     sleep(1)
