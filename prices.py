@@ -45,7 +45,7 @@ def df_to_s3_csv(df,csv_name):
         df.to_csv(csv_buffer, index=False)
 
         response = s3_client.put_object(
-            Bucket='prices', Key=f"{csv_name}.csv", Body=csv_buffer.getvalue()
+            Bucket='crwpl-prices', Key=f"{csv_name}.csv", Body=csv_buffer.getvalue()
         )
 
         status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
@@ -59,7 +59,9 @@ def df_to_s3_csv(df,csv_name):
 prices = []
 while True:
     price = get_price(selector='avg_price', exchange=exchange, market='BTC/USDT')
+    print(f'price: {price}')
     prices.append(price)
-    df = pd.DataFrame({'prices':prices,'dt':datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')})
+    df = pd.DataFrame({'dt':datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S'),'prices':prices})
     df_to_s3_csv(df,'prices')
-    sleep(60)
+    print('added price')
+    sleep(1)

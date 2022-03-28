@@ -20,40 +20,28 @@ s3 = boto3.client('s3')
 app = dash.Dash(__name__)
 app.layout = html.Div(
     html.Div([
-        html.H4('TERRA Satellite Live Feed'),
-        html.Div(id='live-update-text'),
         dcc.Graph(id='live-update-graph'),
         dcc.Interval(
             id='interval-component',
-            interval=1*1000, # in milliseconds
+            interval=1*1000*60, # in milliseconds
             n_intervals=0
         )
     ])
 )
 
 
-@app.callback(Output('live-update-text', 'children'),
-              Input('interval-component', 'n_intervals'))
-def update_metrics(n):
-    lon, lat, alt = satellite.get_lonlatalt(datetime.datetime.now())
-    style = {'padding': '5px', 'fontSize': '16px'}
-    return [
-        html.Span('Longitude: {0:.2f}'.format(lon), style=style),
-        html.Span('Latitude: {0:.2f}'.format(lat), style=style),
-        html.Span('Altitude: {0:0.2f}'.format(alt), style=style)
-    ]
 
 
 # Multiple components can update everytime interval gets fired.
 @app.callback(Output('live-update-graph', 'figure'),
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):
-    obj = s3.get_object(Bucket='crwpl-prices', Key='files/books.csv')
-    df = pd.read_csv('s3://crwpl-prices/files/books.csv')
+    # obj = s3.get_object(Bucket='crwpl-prices', Key='prices.csv')
+    df = pd.read_csv('s3://crwpl-prices/prices.csv')
 
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df['prices'], y=df['prices'],
+    fig.add_trace(go.Scatter(x=df['dt'], y=df['prices'],
                         mode='lines',
                         name='lines'))
 
