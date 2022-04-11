@@ -23,7 +23,7 @@ app.layout = html.Div(
         dcc.Graph(id='live-update-graph'),
         dcc.Interval(
             id='interval-component',
-            interval=1*1000*60, # in milliseconds
+            interval=1*1000*60*60, # in milliseconds
             n_intervals=0
         )
     ])
@@ -49,4 +49,4 @@ def update_graph_live(n):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True,host='0.0.0.0', port=8050)
