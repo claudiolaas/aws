@@ -133,6 +133,7 @@ def get_args() -> dict:
     config["log_pth"] = str(Path(config["log_dir"]) / Path(symbol) / timestr)
     config["base"] = symbol[: symbol.find("-")]
     config["quote"] = symbol[symbol.find("-") + 1 :]
+
     return config
 
 
@@ -299,7 +300,9 @@ def run_bot():
 
         # save df
         df_name = f"df_{i}.csv"
-        df.to_csv(Path(config["log_pth"]) / df_name)
+        csv_path = Path(config["log_pth"]) / df_name 
+        f.df_to_s3_csv(df,csv_path)
+        # df.to_csv(csv_path)
 
     # 420logit
     event_logger.info("Bots initialized")
@@ -427,24 +430,31 @@ def run_bot():
                         df = bots[i]["df"]
                         # loggin / saving
                         df_name = f"df_{i}.csv"
-                        df.to_csv(Path(config["log_pth"]) / df_name)
+                        csv_path = Path(config["log_pth"]) / df_name 
+                        f.df_to_s3_csv(df,csv_path)
+                        # df.to_csv(csv_path)
 
                         multi_df = pd.concat(dfs)
                         multi_df = f.update_multi_df(multi_df, config)
-                        multi_df.to_csv(Path(config["log_pth"]) / "multi_df.csv")
+                        multi_csv_path = Path(config["log_pth"]) / "multi_df.csv"
+                        f.df_to_s3_csv(multi_df,multi_csv_path)
+                        # multi_df.to_csv(multi_csv_path)
 
                         print("backetest finished")
                         sys.exit()
             else:
-                df_name = f"df_{i}.csv"
-                df.to_csv(Path(config["log_pth"]) / df_name)
+                csv_path = Path(config["log_pth"]) / df_name 
+                f.df_to_s3_csv(df,csv_path)
+                # df.to_csv(csv_path)
                 sleep(timeframe_in_sec / number_of_bots)
                 print(f"Iterated bot number {i}.")
 
         if not config["use_mock_data"]:
             multi_df = pd.concat(dfs)
             multi_df = f.update_multi_df(multi_df, config)
-            multi_df.to_csv(Path(config["log_pth"]) / "multi_df.csv")
+            multi_csv_path = Path(config["log_pth"]) / "multi_df.csv"
+            f.df_to_s3_csv(multi_df,multi_csv_path)
+            # multi_df.to_csv(multi_csv_path)
 
         # log total asset return
         asset_current_price = f.get_price("avg_price", config)

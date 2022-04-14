@@ -9,7 +9,7 @@ import pandas as pd
 
 import io
 from time import sleep
-import io
+
 
 cfg = config.get()
 exchange = ccxt.binance()
@@ -51,9 +51,9 @@ def df_to_s3_csv(df,csv_name):
         status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
         if status == 200:
-            print(f"Successful S3 put_object response. Status - {status}")
+            print(f"S3 success - {status}")
         else:
-            print(f"Unsuccessful S3 put_object response. Status - {status}")
+            print(f"S3 failure - {status}")
 
 
 prices = []
@@ -64,6 +64,6 @@ while True:
     prices.append(price)
     dts.append(datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
     df = pd.DataFrame({'dt':dts,'prices':prices})
-    df_to_s3_csv(df,'prices')
+    df_to_s3_csv(df,'prices2')
     print('added price')
     sleep(1)
